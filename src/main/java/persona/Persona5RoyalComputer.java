@@ -1,4 +1,4 @@
-package p5r;
+package persona;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -12,29 +12,26 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Persona 5 Royal 全面具两两配对合成结果计算器。转载代码请保留此处全部注释！
  *
- * @author 陈增辉
- * @date 2024年1月27日
+ * @author 陈增辉 2024年1月27日
  * @link <a href="https://www.bilibili.com/read/cv19379754/">计算公式</a>
  * @link <a href="https://wiki.biligame.com/persona/P5R/%E4%BA%BA%E6%A0%BC%E9%9D%A2%E5%85%B7%E5%9B%BE%E9%89%B4">人格面具图鉴</a>
  * @link <a href="https://wiki.biligame.com/persona/P5R/%E5%90%88%E6%88%90%E8%8C%83%E5%BC%8F">对照表</a>
  */
-public class PersonaComputer {
+public class Persona5RoyalComputer {
 
     /**
      * 资料源
      */
-    private static final String MATERIAL_FILE = "persona.xlsx";
+    private static final String MATERIAL_FILE = "Persona5Royal素材.xlsx";
 
     /**
      * 输出结果
      */
-    private static final String RESULT_FILE = "result.xlsx";
+    private static final String RESULT_FILE = "Persona5Royal两两配对合成结果.xlsx";
 
     /**
      * 全部面具（包括宝魔）
@@ -67,39 +64,34 @@ public class PersonaComputer {
     private static final Map<MaterialPair, String> MATERIAL_SPECIAL_PERSONA_MAP = new LinkedHashMap<>();
 
     /**
-     * 集体合成的面具
-     */
-    private static final Set<String> PERSONA_BY_GROUP = Stream.of("义经", "米迦勒", "梅塔特隆", "隐形鬼", "路西法", "撒旦耶尔",
-            "佛劳洛斯", "塔姆林", "猫将军", "地狱天使", "赛特", "吹号者", "巴古斯", "邪恶霜精", "婆苏吉", "黄龙", "阿修罗王", "斯拉欧加", "蚩尤"
-    ).collect(Collectors.toSet());
-
-    /**
      * 输出结果
      */
     private static final TreeMap<Persona, TreeMap<Persona, Persona>> RESULT = new TreeMap<>();
 
-    public static void main(String[] args) {
-        MATERIAL_SPECIAL_PERSONA_MAP.put(new MaterialPair("巴隆", "兰达"), "湿婆");
-        MATERIAL_SPECIAL_PERSONA_MAP.put(new MaterialPair("贝利亚", "奈比洛斯"), "爱丽丝");
-        MATERIAL_SPECIAL_PERSONA_MAP.put(new MaterialPair("帕尔瓦蒂", "湿婆"), "阿尔达");
+    public static void computer() {
+        System.out.println("Persona 5 Royal：");
         File file = new File(RESULT_FILE);
         if (file.exists() && !file.delete()) {
             System.err.println("请先删除当前目录下的" + RESULT_FILE + "文件！");
             return;
         }
+        System.out.println("正在读取和分析素材文件：" + MATERIAL_FILE);
         readPersonas();
+        System.out.println("正在计算合成结果。。。");
         compute();
-        System.out.println("debug");
+        System.out.println("正在保存计算结果：" + RESULT_FILE);
         saveExcel();
+        System.out.println("完成！");
     }
 
     private static void saveExcel(SXSSFWorkbook wb) {
         SXSSFSheet sheet = wb.createSheet("合成表");
+        AuthorDescription.append(wb);
         int rownum = 0;
         SXSSFRow row1 = sheet.createRow(rownum++);
         SXSSFRow row2 = sheet.createRow(rownum++);
         int columnIndex = 2;
-        for (Persona p2 : RESULT.values().stream().findFirst().get().keySet()) {
+        for (Persona p2 : RESULT.values().stream().findFirst().orElse(new TreeMap<>()).keySet()) {
             row1.createCell(columnIndex).setCellValue(p2.arcana + "Lv" + p2.level);
             row2.createCell(columnIndex++).setCellValue(p2.name);
         }
@@ -229,7 +221,7 @@ public class PersonaComputer {
 
     private static boolean isNotSpecial(Persona persona, String name1, String name2) {
         String name = persona.name;
-        return !MATERIAL_SPECIAL_PERSONA_MAP.containsValue(name) && !PERSONA_BY_GROUP.contains(name)
+        return !MATERIAL_SPECIAL_PERSONA_MAP.containsValue(name) && !persona.isGroup
                 && !name.equals(name1) && !name.equals(name2)
                 && !persona.isPrecious;
     }
@@ -255,8 +247,17 @@ public class PersonaComputer {
                 int level = Double.valueOf(row.getCell(1).getNumericCellValue()).intValue();
                 String name = row.getCell(2).getStringCellValue();
                 Cell cell = row.getCell(3);
-                boolean isPrecious = cell != null && "宝魔".equals(cell.getStringCellValue());
-                Persona persona = new Persona(arcana, level, name, isPrecious);
+                boolean isPrecious;
+                boolean isGroup;
+                if (cell != null) {
+                    String cellValue = cell.getStringCellValue();
+                    isPrecious = "宝魔".equals(cellValue);
+                    isGroup = "集体断头台".equals(cellValue);
+                } else {
+                    isPrecious = false;
+                    isGroup = false;
+                }
+                Persona persona = new Persona(arcana, level, name, isPrecious, isGroup);
                 PERSONA_LIST.add(persona);
                 PERSONA_BY_NAME.put(persona.name, persona);
                 PERSONA_BY_ARCANA.computeIfAbsent(persona.arcana, a -> new ArrayList<>()).add(persona);
@@ -306,6 +307,16 @@ public class PersonaComputer {
                     }
                 }
             }
+            // 特殊二体合成
+            sheet = wb.getSheetAt(3);
+            for (Row row : sheet) {
+                if (row.getRowNum() != 0) {
+                    String m1 = row.getCell(0).getStringCellValue();
+                    String m2 = row.getCell(1).getStringCellValue();
+                    String result = row.getCell(2).getStringCellValue();
+                    MATERIAL_SPECIAL_PERSONA_MAP.put(new MaterialPair(m1, m2), result);
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -320,11 +331,17 @@ public class PersonaComputer {
          */
         final boolean isPrecious;
 
-        public Persona(String arcana, Integer level, String name, boolean isPrecious) {
+        /**
+         * 需要集体断头台合成
+         */
+        final boolean isGroup;
+
+        public Persona(String arcana, Integer level, String name, boolean isPrecious, boolean isGroup) {
             this.arcana = arcana;
             this.level = level;
             this.name = name;
             this.isPrecious = isPrecious;
+            this.isGroup = isGroup;
         }
 
         public String format() {
