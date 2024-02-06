@@ -10,9 +10,15 @@
 
 <a href="https://wiki.biligame.com/persona/P5R/%E5%90%88%E6%88%90%E8%8C%83%E5%BC%8F">对照表</a>
 
-计算器所需要的资料已填入“XXXX素材.xlsx”，执行 Application#main 将在工作目录下先删除再生成 “XXXX两两配对合成结果.xlsx”。
+计算器所需要的资料已填入“游戏名_material.xlsx”，执行 Java 代码 persona.Application#main 或 Golang 代码 app.go
+将在工作目录下先删除再生成 “游戏名_computed.xlsx”。
 
 如果你的游戏进度还没有解锁某些面具，你可以自行删减素材文件里的未解锁面具然后运行程序即可生成你的专属计算结果。
+
+如何运行 release 程序：
+
+* Java 版本需要你自行安装 JRE8 或以上，执行命令：java -jar PersonaComputer.jar
+* Golang 版本已编译为 exe 程序，虽然双击即可运行，当仍然建议在命令行中运行：.\PersonaComputer.exe
 
 已完成：
 

@@ -26,12 +26,12 @@ public class Persona5RoyalComputer {
     /**
      * 资料源
      */
-    private static final String MATERIAL_FILE = "Persona5Royal素材.xlsx";
+    private static final String MATERIAL_FILE = "Persona5Royal_material.xlsx";
 
     /**
      * 输出结果
      */
-    private static final String RESULT_FILE = "Persona5Royal两两配对合成结果.xlsx";
+    private static final String RESULT_FILE = "Persona5Royal_computed.xlsx";
 
     /**
      * 全部面具（包括宝魔）
@@ -259,8 +259,6 @@ public class Persona5RoyalComputer {
                 }
                 Persona persona = new Persona(arcana, level, name, isPrecious, isGroup);
                 PERSONA_LIST.add(persona);
-                PERSONA_BY_NAME.put(persona.name, persona);
-                PERSONA_BY_ARCANA.computeIfAbsent(persona.arcana, a -> new ArrayList<>()).add(persona);
             }
             // 宝魔升降
             sheet = wb.getSheetAt(1);
@@ -319,6 +317,11 @@ public class Persona5RoyalComputer {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        PERSONA_LIST.sort(Persona::compareTo);
+        for (Persona persona : PERSONA_LIST) {
+            PERSONA_BY_NAME.put(persona.name, persona);
+            PERSONA_BY_ARCANA.computeIfAbsent(persona.arcana, a -> new ArrayList<>()).add(persona);
         }
     }
 
