@@ -1,9 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/conlaychan/PersonaComputer/src/main/go"
+)
 
 func main() {
-	Persona5RoyalComputer()
+	persona.P5RoyalComputer()
 	fmt.Println()
-	Persona4GoldenComputer()
+	persona.P4GoldenComputer()
 }

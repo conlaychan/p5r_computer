@@ -1,4 +1,4 @@
-package main
+package persona
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ var materialArcanaMap = make(map[MaterialPair]string)
 var materialSpecialPersonaMap = make(map[MaterialPair]string)
 var resultMap = make(map[Persona]map[Persona]Persona)
 
-func Persona5RoyalComputer() {
+func P5RoyalComputer() {
 	fmt.Println("Persona 5 Royal：")
 	if _, err := os.Lstat(resultFile); err == nil {
 		if err := os.Remove(resultFile); err != nil {

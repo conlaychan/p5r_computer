@@ -1,8 +1,8 @@
-package main
+package persona
 
 import "fmt"
 
-func Persona4GoldenComputer() {
+func P4GoldenComputer() {
 	fmt.Println("Persona 4 Golden：")
 	fmt.Println("敬请期待！")
 }
