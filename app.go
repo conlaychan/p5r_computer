@@ -6,7 +6,11 @@ import (
 )
 
 func main() {
+	persona.InitColumns()
+
 	persona.P5RoyalComputer()
 	fmt.Println()
+
 	persona.P4GoldenComputer()
+	fmt.Println()
 }

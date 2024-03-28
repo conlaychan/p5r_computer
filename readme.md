@@ -6,9 +6,14 @@
 
 <a href="https://www.bilibili.com/read/cv19379754/">计算公式</a>
 
-<a href="https://wiki.biligame.com/persona/P5R/%E4%BA%BA%E6%A0%BC%E9%9D%A2%E5%85%B7%E5%9B%BE%E9%89%B4">人格面具图鉴</a>
+<a href="https://wiki.biligame.com/persona/P5R/%E4%BA%BA%E6%A0%BC%E9%9D%A2%E5%85%B7%E5%9B%BE%E9%89%B4">
+P5R人格面具图鉴</a>
 
-<a href="https://wiki.biligame.com/persona/P5R/%E5%90%88%E6%88%90%E8%8C%83%E5%BC%8F">对照表</a>
+<a href="https://wiki.biligame.com/persona/P5R/%E5%90%88%E6%88%90%E8%8C%83%E5%BC%8F">P5R对照表</a>
+
+<a href="https://gamegene.cn/wiki/476">P4G人格面具图鉴</a>
+
+<a href="https://gamegene.cn/wiki/478">P4G对照表</a>
 
 计算器所需要的资料已填入“游戏名_material.xlsx”，执行 Java 代码 persona.Application#main 或 Golang 代码 app.go
 将在工作目录下先删除再生成 “游戏名_computed.xlsx”。
@@ -23,8 +28,9 @@
 已完成：
 
 * Persona 5 Royal
+* Persona 4 Golden
 
 敬请期待：
 
-* Persona 4 Golden
+* Persona 3 Reload
 
