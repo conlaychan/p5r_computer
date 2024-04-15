@@ -47,18 +47,16 @@ public class Common {
     private static void saveInverse(Context context, SXSSFSheet sheet) {
         // k = 合成结果，v = 合成材料
         TreeMap<Persona, Set<MaterialPair>> inverseHint = new TreeMap<>();
-        context.result.forEach((p1, p2AndResultMap) -> {
-            p2AndResultMap.forEach((p2, result) -> {
-                if (result != null) {
-                    Set<MaterialPair> materialPairs = inverseHint.computeIfAbsent(result, k -> new HashSet<>());
-                    MaterialPair pair1 = new MaterialPair(p1.name, p2.name);
-                    MaterialPair pair2 = new MaterialPair(p2.name, p1.name);
-                    if (!materialPairs.contains(pair1) && !materialPairs.contains(pair2)) {
-                        materialPairs.add(pair1);
-                    }
+        context.result.forEach((p1, p2AndResultMap) -> p2AndResultMap.forEach((p2, result) -> {
+            if (result != null) {
+                Set<MaterialPair> materialPairs = inverseHint.computeIfAbsent(result, k -> new HashSet<>());
+                MaterialPair pair1 = new MaterialPair(p1.name, p2.name);
+                MaterialPair pair2 = new MaterialPair(p2.name, p1.name);
+                if (!materialPairs.contains(pair1) && !materialPairs.contains(pair2)) {
+                    materialPairs.add(pair1);
                 }
-            });
-        });
+            }
+        }));
         // k = 合成结果，v = 合成材料
         TreeMap<Persona, List<MaterialPersonaPair>> inverse = new TreeMap<>();
         inverseHint.forEach((result, materialPairs) -> {
@@ -68,7 +66,7 @@ public class Common {
                 Persona p2 = context.personaByName.get(materialPair.m2);
                 materils.add(new MaterialPersonaPair(p1, p2));
             }
-            materils.sort(Comparator.comparingInt(a -> Math.max(a.p1.level, a.p2.level)));
+            materils.sort(MaterialPersonaPair::compareTo);
             inverse.put(result, materils);
         });
         // 开始写入
@@ -106,13 +104,36 @@ public class Common {
         }
     }
 
-    private static class MaterialPersonaPair {
+    private static class MaterialPersonaPair implements Comparable<MaterialPersonaPair> {
         final Persona p1;
         final Persona p2;
+
+        final int maxLevel;
+        final int minLevel;
 
         private MaterialPersonaPair(Persona p1, Persona p2) {
             this.p1 = p1;
             this.p2 = p2;
+            this.maxLevel = Math.max(p1.level, p2.level);
+            this.minLevel = Math.min(p1.level, p2.level);
+        }
+
+        @Override
+        public int compareTo(MaterialPersonaPair o) {
+            int compare = this.maxLevel - o.maxLevel;
+            if (compare != 0) {
+                return compare;
+            }
+            compare = this.minLevel - o.minLevel;
+            if (compare != 0) {
+                return compare;
+            }
+            compare = this.p1.name.compareTo(o.p1.name);
+            if (compare != 0) {
+                return compare;
+            }
+            compare = this.p2.name.compareTo(o.p2.name);
+            return compare;
         }
     }
 
